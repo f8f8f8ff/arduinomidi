@@ -1,0 +1,6 @@
+{
+    "sketch": "arduinoMidi.ino",
+    "board": "arduino:avr:leonardo",
+    "programmer": "avrdude",
+    "port": "/dev/tty.usbmodemMIDI1"
+}
