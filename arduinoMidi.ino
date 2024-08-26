@@ -1,34 +1,36 @@
 #include "sensor.h"
 
+#define PING_INTERVAL 30
+Sensor SENSOR[] = {
+    Sensor(0, 9, 8, 20, 220),
+    Sensor(1, 6, 7, 20, 220),
+    Sensor(2, 4, 5, 20, 220),
+    Sensor(3, 16, 10, 20, 220),
+};
+uint8_t NUM_SENSORS = 4;
+
 enum state { RUN, PAUSE };
 state STATE = RUN;
 int DELAY = 30;
-int DELAY_MIDI = 2;
+int MIDI_INTERVAL = 10;
 
-unsigned long time;
-unsigned long midi_time;
+unsigned long midiTimer = 0;
 
 void setup() {
     Serial.begin(115200);
     Serial.println("starting");
-    time = millis();
-    midi_time = millis();
+    midiTimer = millis() + 100;
+    initSensorTimers();
 }
 
 void loop() {
     parseSerial();
     switch (STATE) {
         case RUN:
-            if (millis() - time >= DELAY) {
-                readSensors();
-                interpretSensors();
-                // printSensors();
-                time = millis();
-            }
-            if (millis() - midi_time >= DELAY_MIDI) {
-                interpolateSensors();
+            readSensors();
+            if (millis() >= midiTimer) {
+                midiTimer = millis() + MIDI_INTERVAL;
                 sendMidi();
-                midi_time = millis();
             }
             break;
         case PAUSE:
@@ -46,6 +48,7 @@ void parseSerial() {
 
     if (str.equals("start")) {
         STATE = RUN;
+        init();
         printState();
         return;
     }
@@ -74,7 +77,7 @@ void parseSerial() {
             printSensors();
             return;
         }
-        printSensor(i);
+        printSensor(SENSOR[i]);
         return;
     }
     if (str.startsWith("touch")) {
@@ -89,7 +92,8 @@ void parseSerial() {
         }
         Serial.print("touched sensor ");
         Serial.println(i);
-        touchSensor(i);
+        touchSensor(SENSOR[i]);
+        return;
     }
     Serial.println(
         "unknown command. try 'start' 'stop' 'state' 'read [#]' 'touch #' "

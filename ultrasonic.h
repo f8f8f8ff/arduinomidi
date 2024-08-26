@@ -1,4 +1,3 @@
-#pragma once
 #include <NewPing.h>
 
 void ultrasonicInitPins(int trig, int echo) {
