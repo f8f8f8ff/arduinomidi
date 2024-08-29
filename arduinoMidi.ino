@@ -1,6 +1,7 @@
 #include "sensor.h"
 
 #define PING_INTERVAL 30
+// Sensor(int cc, byte trigPin, byte echoPin, int min = 0, int max = 300);
 Sensor SENSOR[] = {
     Sensor(0, 9, 8, 20, 220),
     Sensor(1, 6, 7, 20, 220),
